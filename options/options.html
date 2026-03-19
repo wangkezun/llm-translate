@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Translate 设置</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <h1>LLM Translate 设置</h1>
+
+    <!-- ── 模型管理 ─────────────────────────────────────── -->
+    <section class="card">
+      <h2>模型管理</h2>
+
+      <div class="field">
+        <label>当前模型</label>
+        <div class="model-selector">
+          <select id="activeModel"></select>
+          <button id="addModelBtn" class="icon-btn" title="添加模型">+</button>
+          <button id="delModelBtn" class="icon-btn icon-btn-danger" title="删除当前模型">&minus;</button>
+        </div>
+      </div>
+
+      <div id="modelFields">
+        <div class="field">
+          <label for="modelName">模型名称</label>
+          <input type="text" id="modelName" placeholder="如：GPT-4o / Claude / DeepSeek">
+        </div>
+
+        <div class="field">
+          <label for="apiBaseUrl">API Base URL</label>
+          <input type="text" id="apiBaseUrl" placeholder="https://api.openai.com/v1">
+        </div>
+
+        <div class="field">
+          <label for="apiKey">API Key</label>
+          <input type="password" id="apiKey" placeholder="sk-...">
+        </div>
+
+        <div class="field">
+          <label for="model">模型 ID</label>
+          <input type="text" id="model" placeholder="gpt-4o-mini">
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 翻译设置 ─────────────────────────────────────── -->
+    <section class="card">
+      <h2>翻译设置</h2>
+
+      <div class="field">
+        <label for="targetLang">目标语言</label>
+        <select id="targetLang">
+          <option value="简体中文">简体中文</option>
+          <option value="繁體中文（台灣）">繁體中文（台灣）</option>
+          <option value="繁體中文（香港）">繁體中文（香港）</option>
+          <option value="English">English</option>
+          <option value="日本語">日本語</option>
+          <option value="한국어">한국어</option>
+          <option value="Français">Français</option>
+          <option value="Deutsch">Deutsch</option>
+          <option value="Español">Español</option>
+          <option value="Português">Português</option>
+          <option value="Русский">Русский</option>
+          <option value="العربية">العربية</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="systemPrompt">
+          自定义 System Prompt
+          <span class="hint">（可选，用 {targetLang} 表示目标语言）</span>
+        </label>
+        <textarea id="systemPrompt" rows="4" placeholder="留空使用默认 Prompt"></textarea>
+      </div>
+    </section>
+
+    <button id="saveBtn" class="save-btn">保存设置</button>
+    <div id="status" class="status"></div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

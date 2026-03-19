@@ -1,0 +1,246 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  color: #1f2937;
+  background: #f3f4f6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 560px;
+  margin: 40px auto;
+  padding: 0 20px 60px;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #4f46e5;
+}
+
+h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #374151;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #374151;
+}
+
+.hint {
+  font-weight: 400;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+input[type="text"],
+input[type="password"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1f2937;
+  background: #f9fafb;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #4f46e5;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ── Model selector row ───────────────────────────────────────────── */
+.model-selector {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.model-selector select {
+  flex: 1;
+  min-width: 0;
+}
+
+.icon-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 38px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #f9fafb;
+  font-size: 20px;
+  line-height: 1;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.icon-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.icon-btn-danger:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────── */
+.save-btn {
+  width: 100%;
+  padding: 12px;
+  background: #4f46e5;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.save-btn:hover {
+  background: #4338ca;
+}
+
+.save-btn:active {
+  background: #3730a3;
+}
+
+.status {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #16a34a;
+  min-height: 22px;
+}
+
+.status-warn {
+  color: #d97706;
+}
+
+/* ── Dark Mode ─────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #11111b;
+    color: #cdd6f4;
+  }
+
+  h1 {
+    color: #6366f1;
+  }
+
+  h2 {
+    color: #cdd6f4;
+  }
+
+  .card {
+    background: #1e1e2e;
+    border-color: #313244;
+  }
+
+  label {
+    color: #cdd6f4;
+  }
+
+  .hint {
+    color: #6c7086;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  select,
+  textarea {
+    border: 1px solid #45475a;
+    color: #cdd6f4;
+    background: #181825;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: #6366f1;
+    background: #1e1e2e;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+
+  .icon-btn {
+    border-color: #45475a;
+    background: #181825;
+    color: #cdd6f4;
+  }
+
+  .icon-btn:hover {
+    background: #313244;
+    border-color: #6c7086;
+  }
+
+  .icon-btn-danger:hover {
+    background: #302020;
+    border-color: #f38ba8;
+    color: #f38ba8;
+  }
+
+  .save-btn {
+    background: #6366f1;
+  }
+
+  .save-btn:hover {
+    background: #818cf8;
+  }
+
+  .save-btn:active {
+    background: #6366f1;
+  }
+
+  .status {
+    color: #a6e3a1;
+  }
+
+  .status-warn {
+    color: #fab387;
+  }
+}

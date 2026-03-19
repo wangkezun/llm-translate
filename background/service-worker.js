@@ -1,7 +1,14 @@
-const DEFAULT_CONFIG = {
+const DEFAULT_MODEL = {
+  id: "default",
+  modelName: "GPT-4o-mini",
   apiBaseUrl: "https://api.openai.com/v1",
   apiKey: "",
   model: "gpt-4o-mini",
+};
+
+const DEFAULTS = {
+  models: [DEFAULT_MODEL],
+  activeModelId: "default",
   targetLang: "中文",
   systemPrompt: "",
 };
@@ -10,7 +17,30 @@ const DEFAULT_SYSTEM_PROMPT =
   "You are a professional translator. Translate the following text to {targetLang}. Only return the translated text without any explanation or extra content.";
 
 async function getConfig() {
-  return await chrome.storage.sync.get(DEFAULT_CONFIG);
+  const items = await chrome.storage.sync.get(null);
+
+  // Support old single-model config
+  if (!items.models) {
+    return {
+      apiBaseUrl: items.apiBaseUrl || DEFAULT_MODEL.apiBaseUrl,
+      apiKey: items.apiKey || "",
+      model: items.model || DEFAULT_MODEL.model,
+      targetLang: items.targetLang || DEFAULTS.targetLang,
+      systemPrompt: items.systemPrompt || "",
+    };
+  }
+
+  const models = items.models || DEFAULTS.models;
+  const activeId = items.activeModelId || models[0].id;
+  const activeModel = models.find((m) => m.id === activeId) || models[0];
+
+  return {
+    apiBaseUrl: activeModel.apiBaseUrl || DEFAULT_MODEL.apiBaseUrl,
+    apiKey: activeModel.apiKey || "",
+    model: activeModel.model || DEFAULT_MODEL.model,
+    targetLang: items.targetLang || DEFAULTS.targetLang,
+    systemPrompt: items.systemPrompt || "",
+  };
 }
 
 async function callLLM(text, config) {

@@ -5,7 +5,7 @@
 }
 
 body {
-  width: 360px;
+  width: 280px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
   color: #1f2937;
@@ -13,38 +13,29 @@ body {
 }
 
 .container {
-  padding: 20px;
+  padding: 16px 20px 14px;
 }
 
 h1 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   color: #4f46e5;
 }
 
 .field {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 label {
   display: block;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   margin-bottom: 4px;
   color: #374151;
 }
 
-.hint {
-  font-weight: 400;
-  color: #9ca3af;
-  font-size: 11px;
-}
-
-input[type="text"],
-input[type="password"],
-select,
-textarea {
+select {
   width: 100%;
   padding: 8px 10px;
   border: 1px solid #d1d5db;
@@ -57,45 +48,26 @@ textarea {
   transition: border-color 0.15s;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
+select:focus {
   border-color: #4f46e5;
   background: #ffffff;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 60px;
-}
-
-.save-btn {
-  width: 100%;
-  padding: 10px;
-  background: #4f46e5;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.save-btn:hover {
-  background: #4338ca;
-}
-
-.save-btn:active {
-  background: #3730a3;
-}
-
-.status {
+/* ── Options link ──────────────────────────────────────────────────── */
+.options-link {
+  display: block;
   text-align: center;
-  margin-top: 8px;
+  margin-top: 6px;
+  padding: 8px 0;
   font-size: 13px;
-  color: #16a34a;
-  min-height: 20px;
+  color: #6b7280;
+  text-decoration: none;
+  border-top: 1px solid #e5e7eb;
+  transition: color 0.15s;
+}
+
+.options-link:hover {
+  color: #4f46e5;
 }
 
 /* ── Dark Mode ─────────────────────────────────────────────────────── */
@@ -113,39 +85,23 @@ textarea {
     color: #cdd6f4;
   }
 
-  .hint {
-    color: #6c7086;
-  }
-
-  input[type="text"],
-  input[type="password"],
-  select,
-  textarea {
+  select {
     border: 1px solid #45475a;
     color: #cdd6f4;
     background: #181825;
   }
 
-  input:focus,
-  select:focus,
-  textarea:focus {
+  select:focus {
     border-color: #6366f1;
     background: #1e1e2e;
   }
 
-  .save-btn {
-    background: #6366f1;
+  .options-link {
+    color: #6c7086;
+    border-top-color: #313244;
   }
 
-  .save-btn:hover {
-    background: #818cf8;
-  }
-
-  .save-btn:active {
-    background: #6366f1;
-  }
-
-  .status {
-    color: #a6e3a1;
+  .options-link:hover {
+    color: #818cf8;
   }
 }

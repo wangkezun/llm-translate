@@ -9,18 +9,8 @@
     <h1>LLM Translate</h1>
 
     <div class="field">
-      <label for="apiBaseUrl">API Base URL</label>
-      <input type="text" id="apiBaseUrl" placeholder="https://api.openai.com/v1">
-    </div>
-
-    <div class="field">
-      <label for="apiKey">API Key</label>
-      <input type="password" id="apiKey" placeholder="sk-...">
-    </div>
-
-    <div class="field">
-      <label for="model">模型</label>
-      <input type="text" id="model" placeholder="gpt-4o-mini">
+      <label for="activeModel">翻译模型</label>
+      <select id="activeModel"></select>
     </div>
 
     <div class="field">
@@ -41,16 +31,7 @@
       </select>
     </div>
 
-    <div class="field">
-      <label for="systemPrompt">
-        自定义 System Prompt
-        <span class="hint">（可选，用 {targetLang} 表示目标语言）</span>
-      </label>
-      <textarea id="systemPrompt" rows="3" placeholder="留空使用默认 Prompt"></textarea>
-    </div>
-
-    <button id="saveBtn" class="save-btn">保存设置</button>
-    <div id="status" class="status"></div>
+    <a id="openOptions" class="options-link" href="#">⚙️ 模型与高级设置</a>
   </div>
 
   <script src="popup.js"></script>
