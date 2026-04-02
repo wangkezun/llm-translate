@@ -5,6 +5,9 @@
   "description": "使用大语言模型翻译选中的文本，支持自定义 API 配置",
   "permissions": ["activeTab", "storage", "contextMenus"],
   "host_permissions": ["https://*/", "http://*/"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
   "background": {
     "service_worker": "background/service-worker.js"
   },

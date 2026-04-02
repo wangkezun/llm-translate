@@ -1,54 +1,54 @@
-/* 所有选择器加 #llmt- 前缀避免与页面冲突，用 !important 覆盖页面样式 */
+/* 使用 #llmt- 前缀确保样式隔离，关键属性保留 !important */
 
 #llmt-btn {
-  position: absolute !important;
-  display: none !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 28px !important;
-  height: 28px !important;
-  border-radius: 50% !important;
-  background: #4f46e5 !important;
-  border: none !important;
-  cursor: pointer !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-  z-index: 2147483647 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  line-height: 1 !important;
-  font-size: 14px !important;
-  transition: transform 0.15s, background 0.15s !important;
+  position: absolute;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #4f46e5;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 2147483647;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  font-size: 14px;
+  transition: transform 0.15s, background 0.15s;
 }
 
 #llmt-btn:hover {
-  background: #4338ca !important;
-  transform: scale(1.1) !important;
+  background: #4338ca;
+  transform: scale(1.1);
 }
 
 #llmt-btn svg {
-  width: 16px !important;
-  height: 16px !important;
-  fill: white !important;
-  pointer-events: none !important;
+  width: 16px;
+  height: 16px;
+  fill: white;
+  pointer-events: none;
 }
 
 #llmt-bubble {
-  position: absolute !important;
-  display: none !important;
-  max-width: 420px !important;
-  min-width: 200px !important;
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.15) !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-  color: #1f2937 !important;
-  z-index: 2147483647 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  animation: llmt-fadeIn 0.2s ease !important;
+  position: absolute;
+  display: none;
+  max-width: 420px;
+  min-width: 200px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1f2937;
+  z-index: 2147483647;
+  margin: 0;
+  padding: 0;
+  animation: llmt-fadeIn 0.2s ease;
 }
 
 @keyframes llmt-fadeIn {
@@ -57,114 +57,131 @@
 }
 
 #llmt-bubble .llmt-header {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  padding: 8px 12px !important;
-  border-bottom: 1px solid #f3f4f6 !important;
-  font-size: 12px !important;
-  color: #6b7280 !important;
-  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
 }
 
 #llmt-bubble .llmt-body {
-  padding: 12px !important;
-  max-height: 300px !important;
-  overflow-y: auto !important;
-  word-wrap: break-word !important;
-  white-space: pre-wrap !important;
-  margin: 0 !important;
+  padding: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  margin: 0;
 }
 
 #llmt-bubble .llmt-actions {
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  padding: 6px 12px 8px !important;
-  border-top: 1px solid #f3f4f6 !important;
-  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 8px;
+  border-top: 1px solid #f3f4f6;
+  margin: 0;
 }
 
 #llmt-bubble .llmt-copy-btn {
-  background: none !important;
-  border: 1px solid #d1d5db !important;
-  border-radius: 6px !important;
-  padding: 3px 10px !important;
-  font-size: 12px !important;
-  color: #374151 !important;
-  cursor: pointer !important;
-  transition: background 0.15s !important;
-  margin: 0 !important;
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin: 0;
 }
 
 #llmt-bubble .llmt-copy-btn:hover {
-  background: #f3f4f6 !important;
+  background: #f3f4f6;
 }
 
 #llmt-bubble .llmt-close-btn {
-  background: none !important;
-  border: none !important;
-  cursor: pointer !important;
-  color: #9ca3af !important;
-  font-size: 18px !important;
-  line-height: 1 !important;
-  padding: 0 4px !important;
-  margin: 0 !important;
-  transition: color 0.15s !important;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+  margin: 0;
+  transition: color 0.15s;
 }
 
 #llmt-bubble .llmt-close-btn:hover {
-  color: #4b5563 !important;
+  color: #4b5563;
+}
+
+#llmt-bubble .llmt-cancel-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+  margin: 0;
+  transition: color 0.15s;
+}
+
+#llmt-bubble .llmt-cancel-btn:hover {
+  color: #dc2626;
 }
 
 #llmt-bubble .llmt-loading {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  color: #6b7280 !important;
-  padding: 12px !important;
-  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  padding: 12px;
+  margin: 0;
 }
 
 #llmt-bubble .llmt-spinner {
-  width: 16px !important;
-  height: 16px !important;
-  border: 2px solid #e5e7eb !important;
-  border-top-color: #4f46e5 !important;
-  border-radius: 50% !important;
-  animation: llmt-spin 0.6s linear infinite !important;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: llmt-spin 0.6s linear infinite;
 }
 
 @keyframes llmt-spin {
   to { transform: rotate(360deg); }
 }
 
-#llmt-bubble .llmt-error {
-  color: #dc2626 !important;
-  padding: 12px !important;
-  font-size: 13px !important;
-  margin: 0 !important;
+#llmt-bubble .llmt-error,
+#llmt-bubble .llmt-cancelled {
+  color: #dc2626;
+  padding: 12px;
+  font-size: 13px;
+  margin: 0;
 }
 
 #llmt-bubble .llmt-copied {
-  font-size: 11px !important;
-  color: #16a34a !important;
-  opacity: 0 !important;
-  transition: opacity 0.2s !important;
-  margin: 0 !important;
+  font-size: 11px;
+  color: #16a34a;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin: 0;
 }
 
 #llmt-bubble .llmt-copied.llmt-show {
-  opacity: 1 !important;
+  opacity: 1;
 }
 
 /* 显示状态 */
 #llmt-btn.llmt-visible {
-  display: flex !important;
+  display: flex;
 }
 
 #llmt-bubble.llmt-visible {
-  display: block !important;
+  display: block;
 }
 
 /* ── Dark Mode ─────────────────────────────────────────────────────── */
@@ -211,6 +228,14 @@
     color: #cdd6f4 !important;
   }
 
+  #llmt-bubble .llmt-cancel-btn {
+    color: #6c7086 !important;
+  }
+
+  #llmt-bubble .llmt-cancel-btn:hover {
+    color: #f38ba8 !important;
+  }
+
   #llmt-bubble .llmt-loading {
     color: #a6adc8 !important;
   }
@@ -220,7 +245,8 @@
     border-top-color: #6366f1 !important;
   }
 
-  #llmt-bubble .llmt-error {
+  #llmt-bubble .llmt-error,
+  #llmt-bubble .llmt-cancelled {
     color: #f38ba8 !important;
   }
 

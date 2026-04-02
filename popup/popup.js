@@ -1,12 +1,6 @@
-const FIELDS = ["apiBaseUrl", "apiKey", "model", "targetLang", "systemPrompt"];
+import { DEFAULTS } from "../shared/config.js";
 
-const DEFAULTS = {
-  apiBaseUrl: "https://api.openai.com/v1",
-  apiKey: "",
-  model: "gpt-4o-mini",
-  targetLang: "中文",
-  systemPrompt: "",
-};
+const FIELDS = ["apiBaseUrl", "apiKey", "model", "targetLang", "systemPrompt"];
 
 function loadSettings() {
   chrome.storage.sync.get(DEFAULTS, (items) => {

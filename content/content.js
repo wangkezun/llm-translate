@@ -1,29 +1,51 @@
 (() => {
   "use strict";
 
+  import { PORT_NAME } from "../shared/constants.js";
+
   // ── 通过 Port 长连接调用 service worker ──────────────────────────
   // service worker 中的 fetch 不受页面 mixed-content 限制
   // Port 长连接不受 sendMessage 30 秒超时限制
-  function translate(text) {
+  function translate(text, onProgress) {
     return new Promise((resolve, reject) => {
-      const port = chrome.runtime.connect({ name: "llmt-translate" });
+      const port = chrome.runtime.connect({ name: PORT_NAME });
+      let msgHandlerCalled = false;
+      const requestId = Date.now() + Math.random();
 
-      port.onMessage.addListener((msg) => {
+      function handleMessage(msg) {
+        if (msgHandlerCalled) return;
+        msgHandlerCalled = true;
         port.disconnect();
+        port.onMessage.removeListener(handleMessage);
         if (msg.error) {
           reject(new Error(msg.error));
+        } else if (msg.cancelled) {
+          reject(new Error("Translation cancelled"));
         } else {
           resolve(msg.translated);
         }
-      });
+      }
+
+      port.onMessage.addListener(handleMessage);
 
       port.onDisconnect.addListener(() => {
-        if (chrome.runtime.lastError) {
+        if (chrome.runtime.lastError && !msgHandlerCalled) {
           reject(new Error(chrome.runtime.lastError.message));
         }
       });
 
-      port.postMessage({ type: "translate", text });
+      port.postMessage({ type: "translate", text, requestId });
+    });
+  }
+
+  function cancelRequest(requestId) {
+    return new Promise((resolve) => {
+      const port = chrome.runtime.connect({ name: PORT_NAME });
+      port.postMessage({ type: "cancel", requestId });
+      port.onMessage.addListener((msg) => {
+        resolve(msg.cancelled);
+      });
+      port.disconnect();
     });
   }
 
@@ -42,6 +64,7 @@
   bubble.innerHTML =
     `<div class="llmt-header">` +
       `<span>LLM Translate</span>` +
+      `<button class="llmt-cancel-btn" title="取消">&times;</button>` +
       `<button class="llmt-close-btn" title="关闭">&times;</button>` +
     `</div>` +
     `<div class="llmt-body"></div>` +
@@ -54,11 +77,13 @@
   const bodyEl = bubble.querySelector(".llmt-body");
   const actions = bubble.querySelector(".llmt-actions");
   const closeBtn = bubble.querySelector(".llmt-close-btn");
+  const cancelBtn = bubble.querySelector(".llmt-cancel-btn");
   const copyBtn = bubble.querySelector(".llmt-copy-btn");
   const copiedTip = bubble.querySelector(".llmt-copied");
 
   // ── 状态 ──────────────────────────────────────────────────────────
   let selectedText = "";
+  let currentAbortController = null;
 
   // ── 工具函数 ──────────────────────────────────────────────────────
   function showBtn(x, y) {
@@ -106,8 +131,10 @@
       const text = sel ? sel.toString().trim() : "";
 
       if (text.length > 0) {
+        // 新的选中文本，重置之前的状态
         selectedText = text;
         hideBubble();
+        hideBtn();
         const range = sel.getRangeAt(0);
         const rect = range.getBoundingClientRect();
         showBtn(rect.right + 6, rect.bottom + 6);
@@ -139,17 +166,33 @@
         `<span>正在翻译...</span>` +
       `</div>`;
     actions.style.display = "none";
+    cancelBtn.style.display = "block";
     showBubble(rect.left, rect.top);
 
     translate(text)
       .then((translated) => {
         bodyEl.textContent = translated;
         actions.style.display = "flex";
+        cancelBtn.style.display = "none";
       })
       .catch((err) => {
-        bodyEl.innerHTML = `<div class="llmt-error">${escapeHtml(err.message)}</div>`;
+        if (err.message === "Translation cancelled") {
+          bodyEl.innerHTML = `<div class="llmt-error">翻译已取消</div>`;
+        } else {
+          bodyEl.innerHTML = `<div class="llmt-error">${escapeHtml(err.message)}</div>`;
+        }
         actions.style.display = "none";
+        cancelBtn.style.display = "none";
       });
+  });
+
+  // ── 取消翻译 ───────────────────────────────────────────────────────
+  cancelBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (currentAbortController) {
+      currentAbortController.abort();
+    }
+    hideAll();
   });
 
   // ── 关闭 ──────────────────────────────────────────────────────────
