@@ -1,29 +1,42 @@
 import { DEFAULTS } from "../shared/config.js";
 
-const FIELDS = ["apiBaseUrl", "apiKey", "model", "targetLang", "systemPrompt"];
-
 function loadSettings() {
-  chrome.storage.sync.get(DEFAULTS, (items) => {
-    for (const key of FIELDS) {
-      const el = document.getElementById(key);
-      if (el) el.value = items[key];
+  chrome.storage.sync.get(null, (items) => {
+    const models = items.models && items.models.length > 0
+      ? items.models
+      : DEFAULTS.models;
+    const activeModelId = items.activeModelId || models[0].id;
+
+    // Render model dropdown
+    const sel = document.getElementById("activeModel");
+    sel.innerHTML = "";
+    for (const m of models) {
+      const opt = document.createElement("option");
+      opt.value = m.id;
+      opt.textContent = m.modelName || m.model || "未命名";
+      sel.appendChild(opt);
     }
+    sel.value = activeModelId;
+
+    // Target language
+    document.getElementById("targetLang").value = items.targetLang || DEFAULTS.targetLang;
   });
 }
 
-function saveSettings() {
-  const values = {};
-  for (const key of FIELDS) {
-    const el = document.getElementById(key);
-    values[key] = el ? el.value.trim() : "";
-  }
+// Auto-save on model change
+document.getElementById("activeModel").addEventListener("change", (e) => {
+  chrome.storage.sync.set({ activeModelId: e.target.value });
+});
 
-  chrome.storage.sync.set(values, () => {
-    const status = document.getElementById("status");
-    status.textContent = "设置已保存";
-    setTimeout(() => { status.textContent = ""; }, 2000);
-  });
-}
+// Auto-save on language change
+document.getElementById("targetLang").addEventListener("change", (e) => {
+  chrome.storage.sync.set({ targetLang: e.target.value });
+});
+
+// Open options page
+document.getElementById("openOptions").addEventListener("click", (e) => {
+  e.preventDefault();
+  chrome.runtime.openOptionsPage();
+});
 
 document.addEventListener("DOMContentLoaded", loadSettings);
-document.getElementById("saveBtn").addEventListener("click", saveSettings);

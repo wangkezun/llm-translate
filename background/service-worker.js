@@ -77,7 +77,32 @@ async function getConfig() {
     return cachedConfig;
   }
 
-  const config = await chrome.storage.local.get(DEFAULTS);
+  const items = await chrome.storage.sync.get(null);
+
+  // Support old single-model config
+  let config;
+  if (!items.models) {
+    config = {
+      apiBaseUrl: items.apiBaseUrl || DEFAULTS.apiBaseUrl,
+      apiKey: items.apiKey || "",
+      model: items.model || DEFAULTS.model,
+      targetLang: items.targetLang || DEFAULTS.targetLang,
+      systemPrompt: items.systemPrompt || "",
+    };
+  } else {
+    const models = items.models || DEFAULTS.models;
+    const activeId = items.activeModelId || models[0].id;
+    const activeModel = models.find((m) => m.id === activeId) || models[0];
+
+    config = {
+      apiBaseUrl: activeModel.apiBaseUrl || DEFAULTS.apiBaseUrl,
+      apiKey: activeModel.apiKey || "",
+      model: activeModel.model || DEFAULTS.model,
+      targetLang: items.targetLang || DEFAULTS.targetLang,
+      systemPrompt: items.systemPrompt || "",
+    };
+  }
+
   if (config.apiKey) {
     config.apiKey = await decryptText(config.apiKey);
   }
