@@ -125,8 +125,6 @@ async function fetchModels() {
 }
 
 async function saveSettings() {
-  const apiKey = apiKeyInput.value.trim();
-  const encryptedKey = await encryptText(apiKey);
   const baseUrl = apiBaseUrlInput.value.trim() || DEFAULTS.apiBaseUrl;
 
   if (!isValidApiUrl(baseUrl)) {
@@ -134,7 +132,7 @@ async function saveSettings() {
     return;
   }
 
-  // Request host permission for the API URL
+  // Request host permission FIRST — must be synchronous with user gesture
   try {
     const urlOrigin = new URL(baseUrl).origin + "/*";
     await chrome.permissions.request({ origins: [urlOrigin] });
@@ -142,6 +140,10 @@ async function saveSettings() {
     statusEl.textContent = "需要访问权限才能连接 API";
     return;
   }
+
+  // Encrypt after permission (async is fine now)
+  const apiKey = apiKeyInput.value.trim();
+  const encryptedKey = await encryptText(apiKey);
 
   const config = {
     apiBaseUrl: baseUrl,
