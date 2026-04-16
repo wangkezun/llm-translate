@@ -1,54 +1,93 @@
-/* 使用 #llmt- 前缀确保样式隔离，关键属性保留 !important */
+/* LLM Translate — Apple Popover Style
+   All selectors use #llmt- prefix to avoid page conflicts.
+   Theming via CSS custom properties set by JS. */
 
+/* ── Theme defaults (light page) ─────────────────────────────────── */
+#llmt-btn,
+#llmt-bubble {
+  --llmt-bg: rgba(255, 255, 255, 0.92);
+  --llmt-border: rgba(0, 0, 0, 0.12);
+  --llmt-text-primary: #1d1d1f;
+  --llmt-text-secondary: #86868b;
+  --llmt-text-tertiary: #aeaeb2;
+  --llmt-separator: rgba(0, 0, 0, 0.08);
+  --llmt-action-bg: rgba(0, 0, 0, 0.02);
+  --llmt-action-hover: rgba(0, 0, 0, 0.06);
+  --llmt-badge-bg: #f5f5f7;
+  --llmt-badge-color: #aeaeb2;
+  --llmt-badge-accent-bg: #eef2ff;
+  --llmt-badge-accent-color: #6366f1;
+  --llmt-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 12px 28px rgba(0,0,0,0.12);
+  --llmt-icon-color: #86868b;
+  --llmt-icon-hover-color: #1d1d1f;
+}
+
+/* ── Trigger Button ──────────────────────────────────────────────── */
 #llmt-btn {
   position: absolute;
   display: none;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: #4f46e5;
-  border: none;
+  background: var(--llmt-bg);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 0.5px solid var(--llmt-border);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: var(--llmt-shadow);
   z-index: 2147483647;
   padding: 0;
   margin: 0;
   line-height: 1;
   font-size: 14px;
-  transition: transform 0.15s, background 0.15s;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  opacity: 0.95;
 }
 
 #llmt-btn:hover {
-  background: #4338ca;
-  transform: scale(1.1);
+  transform: scale(1.08);
+  opacity: 1;
 }
 
 #llmt-btn svg {
-  width: 16px;
-  height: 16px;
-  fill: white;
+  width: 17px;
+  height: 17px;
+  fill: var(--llmt-text-secondary);
   pointer-events: none;
 }
 
+/* ── Bubble (Popover) ────────────────────────────────────────────── */
 #llmt-bubble {
   position: absolute;
   display: none;
   max-width: 420px;
-  min-width: 200px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  min-width: 240px;
+  background: var(--llmt-bg);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border: 0.5px solid var(--llmt-border);
   border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  box-shadow: var(--llmt-shadow);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
   line-height: 1.6;
-  color: #1f2937;
+  color: var(--llmt-text-primary);
   z-index: 2147483647;
   margin: 0;
   padding: 0;
-  animation: llmt-fadeIn 0.2s ease;
+}
+
+/* Entrance animation */
+#llmt-bubble.llmt-visible {
+  display: block;
+  animation: llmt-fadeIn 0.2s ease forwards;
+}
+
+/* Exit animation class */
+#llmt-bubble.llmt-hiding {
+  animation: llmt-fadeOut 0.15s ease forwards;
 }
 
 @keyframes llmt-fadeIn {
@@ -56,201 +95,180 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-#llmt-bubble .llmt-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border-bottom: 1px solid #f3f4f6;
-  font-size: 12px;
-  color: #6b7280;
+@keyframes llmt-fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(4px); }
+}
+
+/* ── Bubble body ─────────────────────────────────────────────────── */
+#llmt-bubble .llmt-body {
+  padding: 16px 18px;
   margin: 0;
 }
 
-#llmt-bubble .llmt-body {
-  padding: 12px;
-  max-height: 300px;
-  overflow-y: auto;
+/* ── Original text ───────────────────────────────────────────────── */
+#llmt-bubble .llmt-original {
+  font-size: 13px;
+  color: var(--llmt-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 0.5px dashed var(--llmt-separator);
+  position: relative;
+  padding-right: 36px;
   word-wrap: break-word;
   white-space: pre-wrap;
-  margin: 0;
 }
 
+/* ── Translated text ─────────────────────────────────────────────── */
+#llmt-bubble .llmt-translated {
+  font-size: 15px;
+  color: var(--llmt-text-primary);
+  line-height: 1.7;
+  position: relative;
+  padding-right: 36px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* ── Language badges ─────────────────────────────────────────────── */
+#llmt-bubble .llmt-badge {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  line-height: 1.6;
+  pointer-events: none;
+}
+
+#llmt-bubble .llmt-badge-source {
+  background: var(--llmt-badge-bg);
+  color: var(--llmt-badge-color);
+}
+
+#llmt-bubble .llmt-badge-target {
+  background: var(--llmt-badge-accent-bg);
+  color: var(--llmt-badge-accent-color);
+}
+
+/* ── Action bar ──────────────────────────────────────────────────── */
 #llmt-bubble .llmt-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px 8px;
-  border-top: 1px solid #f3f4f6;
+  padding: 8px 14px;
+  gap: 4px;
+  background: var(--llmt-action-bg);
+  border-top: 0.5px solid var(--llmt-separator);
   margin: 0;
+  border-radius: 0 0 12px 12px;
 }
 
-#llmt-bubble .llmt-copy-btn {
+#llmt-bubble .llmt-action-btn {
   background: none;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  padding: 3px 10px;
-  font-size: 12px;
-  color: #374151;
+  border: none;
+  color: var(--llmt-icon-color);
   cursor: pointer;
-  transition: background 0.15s;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  transition: background 0.15s, color 0.15s;
   margin: 0;
+  padding: 0;
 }
 
-#llmt-bubble .llmt-copy-btn:hover {
-  background: #f3f4f6;
+#llmt-bubble .llmt-action-btn:hover {
+  background: var(--llmt-action-hover);
+  color: var(--llmt-icon-hover-color);
 }
+
+#llmt-bubble .llmt-action-btn svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+  pointer-events: none;
+}
+
+/* Checkmark state for copy button */
+#llmt-bubble .llmt-action-btn.llmt-copied-state svg.llmt-icon-copy { display: none; }
+#llmt-bubble .llmt-action-btn.llmt-copied-state svg.llmt-icon-check { display: block; }
+#llmt-bubble .llmt-action-btn svg.llmt-icon-check { display: none; }
+#llmt-bubble .llmt-action-btn.llmt-copied-state { color: #16a34a; }
+
+/* Speaking state for TTS button */
+#llmt-bubble .llmt-action-btn.llmt-speaking svg.llmt-icon-speak { display: none; }
+#llmt-bubble .llmt-action-btn.llmt-speaking svg.llmt-icon-stop { display: block; }
+#llmt-bubble .llmt-action-btn svg.llmt-icon-stop { display: none; }
+
+#llmt-bubble .llmt-spacer { flex: 1; }
 
 #llmt-bubble .llmt-close-btn {
   background: none;
   border: none;
+  color: var(--llmt-text-tertiary);
   cursor: pointer;
-  color: #9ca3af;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
   font-size: 18px;
   line-height: 1;
-  padding: 0 4px;
+  transition: background 0.15s, color 0.15s;
   margin: 0;
-  transition: color 0.15s;
+  padding: 0;
 }
 
 #llmt-bubble .llmt-close-btn:hover {
-  color: #4b5563;
+  background: var(--llmt-action-hover);
+  color: var(--llmt-icon-hover-color);
 }
 
-#llmt-bubble .llmt-cancel-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #9ca3af;
-  font-size: 18px;
-  line-height: 1;
-  padding: 0 4px;
-  margin: 0;
-  transition: color 0.15s;
-}
-
-#llmt-bubble .llmt-cancel-btn:hover {
-  color: #dc2626;
-}
-
+/* ── Loading state ───────────────────────────────────────────────── */
 #llmt-bubble .llmt-loading {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #6b7280;
-  padding: 12px;
+  gap: 10px;
+  color: var(--llmt-text-secondary);
+  padding: 4px 0;
   margin: 0;
 }
 
 #llmt-bubble .llmt-spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid #e5e7eb;
-  border-top-color: #4f46e5;
+  border: 2px solid var(--llmt-separator);
+  border-top-color: var(--llmt-badge-accent-color);
   border-radius: 50%;
   animation: llmt-spin 0.6s linear infinite;
+  flex-shrink: 0;
 }
 
 @keyframes llmt-spin {
   to { transform: rotate(360deg); }
 }
 
-#llmt-bubble .llmt-error,
-#llmt-bubble .llmt-cancelled {
+/* ── Error / Cancelled states ────────────────────────────────────── */
+#llmt-bubble .llmt-error {
   color: #dc2626;
-  padding: 12px;
   font-size: 13px;
   margin: 0;
 }
 
-#llmt-bubble .llmt-copied {
-  font-size: 11px;
-  color: #16a34a;
-  opacity: 0;
-  transition: opacity 0.2s;
+#llmt-bubble .llmt-cancelled {
+  color: var(--llmt-text-secondary);
+  font-size: 13px;
   margin: 0;
 }
 
-#llmt-bubble .llmt-copied.llmt-show {
-  opacity: 1;
-}
-
-/* 显示状态 */
+/* ── Visibility ──────────────────────────────────────────────────── */
 #llmt-btn.llmt-visible {
   display: flex;
-}
-
-#llmt-bubble.llmt-visible {
-  display: block;
-}
-
-/* ── Dark Mode ─────────────────────────────────────────────────────── */
-@media (prefers-color-scheme: dark) {
-  #llmt-btn {
-    background: #6366f1 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
-  }
-
-  #llmt-btn:hover {
-    background: #818cf8 !important;
-  }
-
-  #llmt-bubble {
-    background: #1e1e2e !important;
-    border: 1px solid #313244 !important;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.5) !important;
-    color: #cdd6f4 !important;
-  }
-
-  #llmt-bubble .llmt-header {
-    border-bottom: 1px solid #313244 !important;
-    color: #a6adc8 !important;
-  }
-
-  #llmt-bubble .llmt-actions {
-    border-top: 1px solid #313244 !important;
-  }
-
-  #llmt-bubble .llmt-copy-btn {
-    border: 1px solid #45475a !important;
-    color: #cdd6f4 !important;
-  }
-
-  #llmt-bubble .llmt-copy-btn:hover {
-    background: #313244 !important;
-  }
-
-  #llmt-bubble .llmt-close-btn {
-    color: #6c7086 !important;
-  }
-
-  #llmt-bubble .llmt-close-btn:hover {
-    color: #cdd6f4 !important;
-  }
-
-  #llmt-bubble .llmt-cancel-btn {
-    color: #6c7086 !important;
-  }
-
-  #llmt-bubble .llmt-cancel-btn:hover {
-    color: #f38ba8 !important;
-  }
-
-  #llmt-bubble .llmt-loading {
-    color: #a6adc8 !important;
-  }
-
-  #llmt-bubble .llmt-spinner {
-    border: 2px solid #313244 !important;
-    border-top-color: #6366f1 !important;
-  }
-
-  #llmt-bubble .llmt-error,
-  #llmt-bubble .llmt-cancelled {
-    color: #f38ba8 !important;
-  }
-
-  #llmt-bubble .llmt-copied {
-    color: #a6e3a1 !important;
-  }
 }
