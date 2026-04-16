@@ -160,8 +160,20 @@
   }
 
   function hideBtn() { btn.classList.remove("llmt-visible"); }
-  function hideBubble() { bubble.classList.remove("llmt-visible"); }
-  function hideAll() { hideBtn(); hideBubble(); selectedText = ""; }
+  function hideBubble() {
+    if (!bubble.classList.contains("llmt-visible")) return;
+    bubble.classList.add("llmt-hiding");
+    bubble.addEventListener("animationend", function onEnd() {
+      bubble.removeEventListener("animationend", onEnd);
+      bubble.classList.remove("llmt-visible", "llmt-hiding");
+    }, { once: true });
+  }
+  function hideAll() {
+    hideBtn();
+    hideBubble();
+    selectedText = "";
+    if (currentUtterance) stopTTS();
+  }
 
   function isOurElement(el) {
     return el && (el === btn || el === bubble || btn.contains(el) || bubble.contains(el));
@@ -343,6 +355,55 @@
     navigator.clipboard.writeText(translatedEl.textContent).then(() => {
       copyBtn.classList.add("llmt-copied-state");
       setTimeout(() => copyBtn.classList.remove("llmt-copied-state"), 1500);
+    });
+  });
+
+  // ── 朗读 (TTS) ───────────────────────────────────────────────────
+  let currentUtterance = null;
+
+  function stopTTS() {
+    window.speechSynthesis.cancel();
+    currentUtterance = null;
+    ttsBtn.classList.remove("llmt-speaking");
+  }
+
+  ttsBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    if (currentUtterance) {
+      stopTTS();
+      return;
+    }
+
+    const text = translatedEl.textContent;
+    if (!text) return;
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const langMap = {
+      "简体中文": "zh-CN", "繁體中文（台灣）": "zh-TW", "繁體中文（香港）": "zh-HK",
+      "English": "en-US", "日本語": "ja-JP", "한국어": "ko-KR",
+      "Français": "fr-FR", "Deutsch": "de-DE", "Español": "es-ES",
+      "Português": "pt-BR", "Русский": "ru-RU", "العربية": "ar-SA",
+    };
+
+    chrome.storage.sync.get("targetLang", (items) => {
+      const targetLang = items.targetLang || "简体中文";
+      utterance.lang = langMap[targetLang] || "zh-CN";
+      utterance.rate = 1.0;
+
+      utterance.onend = () => {
+        currentUtterance = null;
+        ttsBtn.classList.remove("llmt-speaking");
+      };
+
+      utterance.onerror = () => {
+        currentUtterance = null;
+        ttsBtn.classList.remove("llmt-speaking");
+      };
+
+      currentUtterance = utterance;
+      ttsBtn.classList.add("llmt-speaking");
+      window.speechSynthesis.speak(utterance);
     });
   });
 })();
