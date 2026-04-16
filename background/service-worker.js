@@ -111,15 +111,6 @@ async function getConfig() {
   return config;
 }
 
-async function saveConfig(config) {
-  if (config.apiKey) {
-    config.apiKey = await encryptText(config.apiKey);
-  }
-  await chrome.storage.local.set(config);
-  // Invalidate cache
-  cachedConfig = null;
-  cachedConfigTime = 0;
-}
 
 // Track active abort controllers for cancel functionality
 const activeRequests = new Map();
