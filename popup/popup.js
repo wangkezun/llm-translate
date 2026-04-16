@@ -56,6 +56,15 @@ function populateModels(modelIds, selectedModel) {
   }
 }
 
+function isValidApiUrl(urlStr) {
+  try {
+    const url = new URL(urlStr);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 function setModelStatus(message, isError) {
   modelStatus.textContent = message;
   modelStatus.className = "model-status " + (isError ? "error" : "success");
@@ -65,8 +74,8 @@ async function fetchModels() {
   const baseUrl = apiBaseUrlInput.value.trim();
   const apiKey = apiKeyInput.value.trim();
 
-  if (!baseUrl) {
-    setModelStatus("请先填写 API Base URL", true);
+  if (!baseUrl || !isValidApiUrl(baseUrl)) {
+    setModelStatus("请填写有效的 API Base URL", true);
     return;
   }
 
@@ -118,9 +127,24 @@ async function fetchModels() {
 async function saveSettings() {
   const apiKey = apiKeyInput.value.trim();
   const encryptedKey = await encryptText(apiKey);
+  const baseUrl = apiBaseUrlInput.value.trim() || DEFAULTS.apiBaseUrl;
+
+  if (!isValidApiUrl(baseUrl)) {
+    statusEl.textContent = "请输入有效的 API URL";
+    return;
+  }
+
+  // Request host permission for the API URL
+  try {
+    const urlOrigin = new URL(baseUrl).origin + "/*";
+    await chrome.permissions.request({ origins: [urlOrigin] });
+  } catch (e) {
+    statusEl.textContent = "需要访问权限才能连接 API";
+    return;
+  }
 
   const config = {
-    apiBaseUrl: apiBaseUrlInput.value.trim() || DEFAULTS.apiBaseUrl,
+    apiBaseUrl: baseUrl,
     apiKey: encryptedKey,
     model: modelSelect.value,
     targetLang: targetLangSelect.value,
