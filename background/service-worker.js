@@ -70,13 +70,13 @@ function createAbortControllerWithTimeout() {
   return { abortController, timeoutId };
 }
 
-async function callLLM(text, config, abortController = null) {
+async function callLLM(text, config, controllers = null) {
   const url = config.apiBaseUrl.replace(/\/+$/, "") + "/chat/completions";
   const template = config.systemPrompt || DEFAULT_SYSTEM_PROMPT;
   const systemPrompt = template.replace("{targetLang}", config.targetLang);
 
-  const { abortController: localAbortController, timeoutId } =
-    abortController || createAbortControllerWithTimeout();
+  const { abortController, timeoutId } =
+    controllers || createAbortControllerWithTimeout();
 
   try {
     const resp = await fetch(url, {
@@ -93,7 +93,7 @@ async function callLLM(text, config, abortController = null) {
         ],
         temperature: 0.3,
       }),
-      signal: localAbortController.signal,
+      signal: abortController.signal,
     });
 
     if (!resp.ok) {
@@ -136,7 +136,7 @@ async function callLLM(text, config, abortController = null) {
     }
     throw err;
   } finally {
-    if (!abortController) {
+    if (!controllers) {
       clearTimeout(timeoutId);
     }
   }
@@ -148,16 +148,25 @@ chrome.runtime.onConnect.addListener((port) => {
 
   port.onMessage.addListener(async (msg) => {
     if (msg.type === "translate") {
+      const requestId = msg.requestId;
       try {
         const config = await getConfig();
         if (!config.apiKey && !config.apiBaseUrl.includes("localhost")) {
           port.postMessage({ error: "请先在插件设置中配置 API Key" });
           return;
         }
-        const translated = await callLLM(msg.text, config);
+        const { abortController, timeoutId } = createAbortControllerWithTimeout();
+        activeRequests.set(requestId, { abortController, timeoutId });
+        const translated = await callLLM(msg.text, config, { abortController, timeoutId });
+        activeRequests.delete(requestId);
         port.postMessage({ translated });
       } catch (err) {
-        port.postMessage({ error: err.message });
+        activeRequests.delete(requestId);
+        if (err.message === "翻译已取消") {
+          port.postMessage({ cancelled: true });
+        } else {
+          port.postMessage({ error: err.message });
+        }
       }
     } else if (msg.type === "cancel") {
       // Handle cancel request

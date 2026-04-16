@@ -8,17 +8,25 @@
   // ── 通过 Port 长连接调用 service worker ──────────────────────────
   // service worker 中的 fetch 不受页面 mixed-content 限制
   // Port 长连接不受 sendMessage 30 秒超时限制
-  function translate(text, onProgress) {
+  let currentRequestId = null;
+  let currentPort = null;
+
+  function translate(text) {
     return new Promise((resolve, reject) => {
       const port = chrome.runtime.connect({ name: PORT_NAME });
-      let msgHandlerCalled = false;
       const requestId = Date.now() + Math.random();
+      currentRequestId = requestId;
+      currentPort = port;
+
+      function cleanup() {
+        currentRequestId = null;
+        currentPort = null;
+        port.onMessage.removeListener(handleMessage);
+      }
 
       function handleMessage(msg) {
-        if (msgHandlerCalled) return;
-        msgHandlerCalled = true;
+        cleanup();
         port.disconnect();
-        port.onMessage.removeListener(handleMessage);
         if (msg.error) {
           reject(new Error(msg.error));
         } else if (msg.cancelled) {
@@ -31,23 +39,13 @@
       port.onMessage.addListener(handleMessage);
 
       port.onDisconnect.addListener(() => {
-        if (chrome.runtime.lastError && !msgHandlerCalled) {
+        if (chrome.runtime.lastError) {
+          cleanup();
           reject(new Error(chrome.runtime.lastError.message));
         }
       });
 
       port.postMessage({ type: "translate", text, requestId });
-    });
-  }
-
-  function cancelRequest(requestId) {
-    return new Promise((resolve) => {
-      const port = chrome.runtime.connect({ name: PORT_NAME });
-      port.postMessage({ type: "cancel", requestId });
-      port.onMessage.addListener((msg) => {
-        resolve(msg.cancelled);
-      });
-      port.disconnect();
     });
   }
 
@@ -85,7 +83,6 @@
 
   // ── 状态 ──────────────────────────────────────────────────────────
   let selectedText = "";
-  let currentAbortController = null;
 
   // ── 工具函数 ──────────────────────────────────────────────────────
   function showBtn(x, y) {
@@ -191,10 +188,12 @@
   // ── 取消翻译 ───────────────────────────────────────────────────────
   cancelBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    if (currentAbortController) {
-      currentAbortController.abort();
+    if (currentPort && currentRequestId) {
+      currentPort.postMessage({ type: "cancel", requestId: currentRequestId });
+      currentPort = null;
+      currentRequestId = null;
     }
-    hideAll();
+    hideBubble();
   });
 
   // ── 关闭 ──────────────────────────────────────────────────────────
