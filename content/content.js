@@ -167,6 +167,78 @@
     return el && (el === btn || el === bubble || btn.contains(el) || bubble.contains(el));
   }
 
+  // ── 页面自适应主题 ────────────────────────────────────────────────
+  function getPageBackgroundColor(el) {
+    let current = el;
+    while (current && current !== document.documentElement) {
+      const bg = getComputedStyle(current).backgroundColor;
+      if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
+        return bg;
+      }
+      current = current.parentElement;
+    }
+    const bodyBg = getComputedStyle(document.body).backgroundColor;
+    if (bodyBg && bodyBg !== "rgba(0, 0, 0, 0)" && bodyBg !== "transparent") {
+      return bodyBg;
+    }
+    return "rgb(255, 255, 255)";
+  }
+
+  function parseRgb(colorStr) {
+    const match = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (!match) return { r: 255, g: 255, b: 255 };
+    return { r: +match[1], g: +match[2], b: +match[3] };
+  }
+
+  function getLuminance(r, g, b) {
+    return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function lerpColor(light, dark, t) {
+    return "rgba(" +
+      Math.round(lerp(light[0], dark[0], t)) + ", " +
+      Math.round(lerp(light[1], dark[1], t)) + ", " +
+      Math.round(lerp(light[2], dark[2], t)) + ", " +
+      lerp(light[3], dark[3], t).toFixed(2) + ")";
+  }
+
+  function applyAdaptiveTheme(targetEl, anchorEl) {
+    const bgColor = getPageBackgroundColor(anchorEl || document.body);
+    const { r, g, b } = parseRgb(bgColor);
+    const lum = getLuminance(r, g, b);
+
+    let t;
+    if (lum >= 0.7) t = 0;
+    else if (lum <= 0.3) t = 1;
+    else t = 1 - (lum - 0.3) / 0.4;
+
+    const s = targetEl.style;
+    s.setProperty("--llmt-bg", lerpColor([255,255,255,0.92], [30,30,46,0.88], t));
+    s.setProperty("--llmt-border", lerpColor([0,0,0,0.12], [255,255,255,0.1], t));
+    s.setProperty("--llmt-text-primary", lerpColor([29,29,31,1], [205,214,244,1], t));
+    s.setProperty("--llmt-text-secondary", lerpColor([134,134,139,1], [166,173,200,1], t));
+    s.setProperty("--llmt-text-tertiary", lerpColor([174,174,178,1], [108,112,134,1], t));
+    s.setProperty("--llmt-separator", lerpColor([0,0,0,0.08], [255,255,255,0.08], t));
+    s.setProperty("--llmt-action-bg", lerpColor([0,0,0,0.02], [255,255,255,0.02], t));
+    s.setProperty("--llmt-action-hover", lerpColor([0,0,0,0.06], [255,255,255,0.08], t));
+    s.setProperty("--llmt-badge-bg", lerpColor([245,245,247,1], [255,255,255,0.08], t));
+    s.setProperty("--llmt-badge-color", lerpColor([174,174,178,1], [108,112,134,1], t));
+    s.setProperty("--llmt-badge-accent-bg", lerpColor([238,242,255,1], [99,102,241,0.15], t));
+    s.setProperty("--llmt-badge-accent-color", lerpColor([99,102,241,1], [165,180,252,1], t));
+    s.setProperty("--llmt-icon-color", lerpColor([134,134,139,1], [108,112,134,1], t));
+    s.setProperty("--llmt-icon-hover-color", lerpColor([29,29,31,1], [205,214,244,1], t));
+
+    if (t > 0.5) {
+      s.setProperty("--llmt-shadow", "0 2px 4px rgba(0,0,0,0.2), 0 12px 28px rgba(0,0,0,0.4)");
+    } else {
+      s.setProperty("--llmt-shadow", "0 2px 4px rgba(0,0,0,0.04), 0 12px 28px rgba(0,0,0,0.12)");
+    }
+  }
+
   // ── 选中文本 → 显示按钮 ──────────────────────────────────────────
   document.addEventListener("mouseup", (e) => {
     if (isOurElement(e.target)) return;
@@ -176,12 +248,16 @@
       const text = sel ? sel.toString().trim() : "";
 
       if (text.length > 0) {
-        // 新的选中文本，重置之前的状态
         selectedText = text;
         hideBubble();
         hideBtn();
         const range = sel.getRangeAt(0);
         const rect = range.getBoundingClientRect();
+        const anchorEl = range.startContainer.nodeType === Node.TEXT_NODE
+          ? range.startContainer.parentElement
+          : range.startContainer;
+        applyAdaptiveTheme(btn, anchorEl);
+        applyAdaptiveTheme(bubble, anchorEl);
         showBtn(rect.right + 6, rect.bottom + 6);
       }
     }, 10);
