@@ -59,27 +59,79 @@
   document.body.appendChild(btn);
 
   // ── 创建翻译气泡 ──────────────────────────────────────────────────
+  const SVG_NS = "http://www.w3.org/2000/svg";
+
+  function makeSvgIcon(pathD, className) {
+    const svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("class", className);
+    const path = document.createElementNS(SVG_NS, "path");
+    path.setAttribute("d", pathD);
+    svg.appendChild(path);
+    return svg;
+  }
+
   const bubble = document.createElement("div");
   bubble.id = "llmt-bubble";
-  bubble.innerHTML =
-    `<div class="llmt-header">` +
-      `<span>LLM Translate</span>` +
-      `<button class="llmt-cancel-btn" title="取消">&times;</button>` +
-      `<button class="llmt-close-btn" title="关闭">&times;</button>` +
-    `</div>` +
-    `<div class="llmt-body"></div>` +
-    `<div class="llmt-actions">` +
-      `<button class="llmt-copy-btn">复制</button>` +
-      `<span class="llmt-copied">已复制</span>` +
-    `</div>`;
-  document.body.appendChild(bubble);
 
-  const bodyEl = bubble.querySelector(".llmt-body");
-  const actions = bubble.querySelector(".llmt-actions");
-  const closeBtn = bubble.querySelector(".llmt-close-btn");
-  const cancelBtn = bubble.querySelector(".llmt-cancel-btn");
-  const copyBtn = bubble.querySelector(".llmt-copy-btn");
-  const copiedTip = bubble.querySelector(".llmt-copied");
+  // Body
+  const bubbleBody = document.createElement("div");
+  bubbleBody.className = "llmt-body";
+
+  // Original section
+  const originalSection = document.createElement("div");
+  originalSection.className = "llmt-original";
+  const sourceBadge = document.createElement("span");
+  sourceBadge.className = "llmt-badge llmt-badge-source";
+  sourceBadge.textContent = "EN";
+  const originalEl = document.createElement("span");
+  originalEl.className = "llmt-original-text";
+  originalSection.appendChild(sourceBadge);
+  originalSection.appendChild(originalEl);
+
+  // Translated section
+  const translatedSection = document.createElement("div");
+  translatedSection.className = "llmt-translated";
+  const targetBadge = document.createElement("span");
+  targetBadge.className = "llmt-badge llmt-badge-target";
+  targetBadge.textContent = "ZH";
+  const translatedEl = document.createElement("span");
+  translatedEl.className = "llmt-translated-text";
+  translatedSection.appendChild(targetBadge);
+  translatedSection.appendChild(translatedEl);
+
+  bubbleBody.appendChild(originalSection);
+  bubbleBody.appendChild(translatedSection);
+
+  // Actions bar
+  const actionsBar = document.createElement("div");
+  actionsBar.className = "llmt-actions";
+
+  const copyBtn = document.createElement("button");
+  copyBtn.className = "llmt-action-btn llmt-copy-btn";
+  copyBtn.appendChild(makeSvgIcon("M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z", "llmt-icon-copy"));
+  copyBtn.appendChild(makeSvgIcon("M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z", "llmt-icon-check"));
+
+  const ttsBtn = document.createElement("button");
+  ttsBtn.className = "llmt-action-btn llmt-tts-btn";
+  ttsBtn.appendChild(makeSvgIcon("M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z", "llmt-icon-speak"));
+  ttsBtn.appendChild(makeSvgIcon("M6 6h12v12H6z", "llmt-icon-stop"));
+
+  const spacer = document.createElement("div");
+  spacer.className = "llmt-spacer";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "llmt-close-btn";
+  closeBtn.textContent = "\u00d7";
+
+  actionsBar.appendChild(copyBtn);
+  actionsBar.appendChild(ttsBtn);
+  actionsBar.appendChild(spacer);
+  actionsBar.appendChild(closeBtn);
+
+  bubble.appendChild(bubbleBody);
+  bubble.appendChild(actionsBar);
+  document.body.appendChild(bubble);
 
   // ── 状态 ──────────────────────────────────────────────────────────
   let selectedText = "";
@@ -113,12 +165,6 @@
 
   function isOurElement(el) {
     return el && (el === btn || el === bubble || btn.contains(el) || bubble.contains(el));
-  }
-
-  function escapeHtml(str) {
-    const d = document.createElement("div");
-    d.textContent = str;
-    return d.innerHTML;
   }
 
   // ── 选中文本 → 显示按钮 ──────────────────────────────────────────
@@ -158,56 +204,69 @@
     const rect = btn.getBoundingClientRect();
     hideBtn();
 
-    // 显示 loading
-    bodyEl.innerHTML =
-      `<div class="llmt-loading">` +
-        `<div class="llmt-spinner"></div>` +
-        `<span>正在翻译...</span>` +
-      `</div>`;
-    actions.style.display = "none";
-    cancelBtn.style.display = "block";
+    // Show original text
+    originalEl.textContent = text;
+    originalSection.style.display = "";
+    translatedSection.style.display = "none";
+
+    // Clean up previous status elements
+    bubbleBody.querySelectorAll(".llmt-loading, .llmt-error, .llmt-cancelled").forEach(el => el.remove());
+
+    // Create loading element
+    const loading = document.createElement("div");
+    loading.className = "llmt-loading";
+    const spinner = document.createElement("div");
+    spinner.className = "llmt-spinner";
+    const loadingText = document.createElement("span");
+    loadingText.textContent = "正在翻译...";
+    loading.appendChild(spinner);
+    loading.appendChild(loadingText);
+    bubbleBody.appendChild(loading);
+
+    actionsBar.style.display = "none";
     showBubble(rect.left, rect.top);
 
     translate(text)
       .then((translated) => {
-        bodyEl.textContent = translated;
-        actions.style.display = "flex";
-        cancelBtn.style.display = "none";
+        loading.remove();
+        translatedEl.textContent = translated;
+        translatedSection.style.display = "";
+        actionsBar.style.display = "";
       })
       .catch((err) => {
+        loading.remove();
         if (err.message === "Translation cancelled") {
-          bodyEl.innerHTML = `<div class="llmt-error">翻译已取消</div>`;
+          const cancelled = document.createElement("div");
+          cancelled.className = "llmt-cancelled";
+          cancelled.textContent = "翻译已取消";
+          bubbleBody.appendChild(cancelled);
         } else {
-          bodyEl.innerHTML = `<div class="llmt-error">${escapeHtml(err.message)}</div>`;
+          const errorEl = document.createElement("div");
+          errorEl.className = "llmt-error";
+          errorEl.textContent = err.message;
+          bubbleBody.appendChild(errorEl);
         }
-        actions.style.display = "none";
-        cancelBtn.style.display = "none";
+        actionsBar.style.display = "none";
       });
   });
 
-  // ── 取消翻译 ───────────────────────────────────────────────────────
-  cancelBtn.addEventListener("click", (e) => {
+  // ── 关闭（兼取消） ──────────────────────────────────────────────────
+  closeBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     if (currentPort && currentRequestId) {
       currentPort.postMessage({ type: "cancel", requestId: currentRequestId });
-      currentPort = null;
       currentRequestId = null;
+      currentPort = null;
     }
-    hideBubble();
-  });
-
-  // ── 关闭 ──────────────────────────────────────────────────────────
-  closeBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
     hideAll();
   });
 
   // ── 复制 ──────────────────────────────────────────────────────────
   copyBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(bodyEl.textContent).then(() => {
-      copiedTip.classList.add("llmt-show");
-      setTimeout(() => copiedTip.classList.remove("llmt-show"), 1500);
+    navigator.clipboard.writeText(translatedEl.textContent).then(() => {
+      copyBtn.classList.add("llmt-copied-state");
+      setTimeout(() => copyBtn.classList.remove("llmt-copied-state"), 1500);
     });
   });
 })();
