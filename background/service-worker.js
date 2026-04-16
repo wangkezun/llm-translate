@@ -12,6 +12,14 @@ let cachedConfig = null;
 let cachedConfigTime = 0;
 const CONFIG_CACHE_TTL = 60000; // 60 seconds
 
+// Invalidate config cache when storage changes
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "sync") {
+    cachedConfig = null;
+    cachedConfigTime = 0;
+  }
+});
+
 async function getConfig() {
   const now = Date.now();
   if (cachedConfig && now - cachedConfigTime < CONFIG_CACHE_TTL) {
@@ -105,8 +113,7 @@ async function callLLM(text, config, abortController = null) {
     let data;
     try {
       data = await resp.json();
-    } catch (err) {
-      const text = await resp.text();
+    } catch {
       throw new Error("API 返回了无效的 JSON 格式");
     }
 
