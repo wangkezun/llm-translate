@@ -1,6 +1,6 @@
 # LLM Translate
 
-A Chrome extension that translates selected text using any OpenAI-compatible LLM API.
+A Chrome extension that translates selected text using any OpenAI-compatible LLM API. Features an Apple-style glassmorphism popover with page-adaptive theming.
 
 ## Features
 
@@ -8,8 +8,13 @@ A Chrome extension that translates selected text using any OpenAI-compatible LLM
 - Works with any OpenAI-compatible API (OpenAI, Ollama, LM Studio, etc.)
 - Supports 12 target languages: Simplified Chinese, Traditional Chinese (TW/HK), English, Japanese, Korean, French, German, Spanish, Portuguese, Russian, Arabic
 - Customizable system prompt with `{targetLang}` placeholder
-- Dark mode support
-- Copy translation result to clipboard with one click
+- Original/translated text side-by-side comparison with language badges
+- Page-adaptive theming — automatically detects page background and adjusts between light/dark styles
+- Text-to-speech (TTS) — read translated text aloud with auto language detection
+- Copy translation to clipboard with one click
+- Cancel in-flight translations
+- Dynamic model list fetching from API provider
+- API Key encrypted at rest (AES-GCM)
 
 ## Installation
 
@@ -25,10 +30,12 @@ Click the extension icon to open the settings popup:
 | Setting | Description | Default |
 |---------|-------------|---------|
 | API Base URL | OpenAI-compatible API endpoint | `https://api.openai.com/v1` |
-| API Key | Your API key (not required for local models) | - |
-| Model | Model name to use | `gpt-4o-mini` |
+| API Key | Your API key (encrypted locally, not required for local models) | - |
+| Model | Select from dropdown after fetching model list | `gpt-4o-mini` |
 | Target Language | Translation target language | Simplified Chinese |
 | System Prompt | Custom system prompt (optional) | Built-in translation prompt |
+
+Click the refresh button (⟳) next to the model dropdown to fetch available models from your API provider.
 
 ### Using with local models
 
@@ -38,8 +45,10 @@ Set the API Base URL to your local endpoint (e.g., `http://localhost:11434/v1` f
 
 1. Select any text on a webpage
 2. Click the translate icon that appears near the selection
-3. View the translation in the popup bubble
-4. Click **Copy** to copy the result
+3. View the original text and translation in the popover
+4. Click the **copy icon** to copy the translation
+5. Click the **speaker icon** to hear the translation read aloud
+6. Click **×** to close (also cancels in-progress translations)
 
 ## License
 
