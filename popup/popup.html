@@ -20,7 +20,13 @@
 
     <div class="field">
       <label for="model">模型</label>
-      <input type="text" id="model" placeholder="gpt-4o-mini">
+      <div class="model-row">
+        <select id="model" disabled>
+          <option value="">请先获取模型列表</option>
+        </select>
+        <button id="fetchModelsBtn" class="fetch-btn" title="获取模型列表">⟳</button>
+      </div>
+      <div id="modelStatus" class="model-status"></div>
     </div>
 
     <div class="field">
@@ -53,6 +59,6 @@
     <div id="status" class="status"></div>
   </div>
 
-  <script src="popup.js"></script>
+  <script src="popup.js" type="module"></script>
 </body>
 </html>
