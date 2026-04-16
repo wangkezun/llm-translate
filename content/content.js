@@ -1,7 +1,9 @@
 (() => {
   "use strict";
 
-  import { PORT_NAME } from "../shared/constants.js";
+  // Content scripts cannot use ES modules in MV3; inline the constant
+  // Keep in sync with shared/constants.js PORT_NAME
+  const PORT_NAME = "llmt-translate";
 
   // ── 通过 Port 长连接调用 service worker ──────────────────────────
   // service worker 中的 fetch 不受页面 mixed-content 限制
