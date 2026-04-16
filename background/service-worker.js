@@ -2,10 +2,9 @@ import { DEFAULTS } from "../shared/config.js";
 import {
   DEFAULT_TIMEOUT,
   DEFAULT_SYSTEM_PROMPT,
-  ENCRYPTION_KEY_NAME,
   PORT_NAME,
 } from "../shared/constants.js";
-import { encryptText, decryptText } from "../shared/crypto.js";
+import { decryptText } from "../shared/crypto.js";
 
 // In-memory cache for configuration
 let cachedConfig = null;
