@@ -133,10 +133,15 @@ async function saveSettings() {
   }
 
   // Request host permission FIRST — must be synchronous with user gesture
+  let granted = false;
   try {
     const urlOrigin = new URL(baseUrl).origin + "/*";
-    await chrome.permissions.request({ origins: [urlOrigin] });
+    granted = await chrome.permissions.request({ origins: [urlOrigin] });
   } catch (e) {
+    statusEl.textContent = "权限请求失败: " + e.message;
+    return;
+  }
+  if (!granted) {
     statusEl.textContent = "需要访问权限才能连接 API";
     return;
   }
@@ -154,6 +159,10 @@ async function saveSettings() {
   };
 
   chrome.storage.sync.set(config, () => {
+    if (chrome.runtime.lastError) {
+      statusEl.textContent = "保存失败: " + chrome.runtime.lastError.message;
+      return;
+    }
     statusEl.textContent = "设置已保存";
     setTimeout(() => { statusEl.textContent = ""; }, 2000);
   });
